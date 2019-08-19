@@ -52,6 +52,7 @@ body{
   padding:1em;
   border-bottom:thin #ccc dotted;
   color:black;
+  text-decoration:none;
 }
 
 /*header */

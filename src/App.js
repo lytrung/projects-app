@@ -3,10 +3,12 @@ import axios from 'axios';
 
 import View from './View';
 import Project from './Project';
+import AddProjectForm from './AddProjectForm';
+import EditProjectForm from './EditProjectForm';
 
 import './App.css';
 
-var urlPrefix = 'http://10.2.24.39:4000/api'
+var urlPrefix = 'http://10.2.24.38:4000/api'
 
 class  App extends Component {
 
@@ -25,7 +27,8 @@ class  App extends Component {
           name:'Make a basket',
           description: 'Pretty project'
         }
-      ]
+      ],
+      projectToUpdate:null
     };
 
   }
@@ -33,17 +36,47 @@ class  App extends Component {
     this.setState({activeView:view});
   }
 
+  setProjectToUpdate = (id) => {
+
+    var foundProject = this.state.projects.find((project) => {
+      return project.id === id;
+    })
+
+    this.setState({projectToUpdate:foundProject})
+  }
+
   getProjects = () => {
     axios.get(urlPrefix+'/projects')
     .then(res => {
-      console.log(res);
+      this.setState({projects:res.data});
     })
   }
 
-  addProjects = (data) => {}
-  deleteProjects = (id) => {}
-  updateProjects = (id,data) => {}
+  addProjects = (data) => {
+    axios.post(urlPrefix+'/projects',data)
+    .then(res => {
+      this.getProjects()
+    })
+  }
 
+  deleteProjects = (id) => {
+    axios.delete(urlPrefix+'/projects/'+id)
+    .then(res => {
+
+      this.getProjects();
+    })
+  }
+
+  updateProjects = (id,data) => {
+    axios.put(urlPrefix+'/projects/'+id,data)
+    .then(res => {
+      this.getProjects();
+    })
+  }
+
+  componentDidMount(){
+    this.getProjects();
+  }
 
   render(){
 
@@ -52,7 +85,10 @@ class  App extends Component {
       
           <View viewName="projects" activeView={this.state.activeView} className="color1" >
 
-            <div className="header"><i onClick={() => this.setActiveView('nav')} className="fas fa-bars"></i></div>
+            <div className="header">
+              <i onClick={() => this.setActiveView('add-project')} className="fas fa-plus"></i>
+              <i onClick={() => this.setActiveView('nav')} className="fas fa-bars"></i>
+            </div>
             <div className="main">
               <h3>Projects</h3>
 
@@ -61,7 +97,10 @@ class  App extends Component {
 
                   var projectProps = {
                     ...project,
-                    key: project.id
+                    key: project.id,
+                    deleteProjects: this.deleteProjects,
+                    setActiveView: this.setActiveView,
+                    setProjectToUpdate: this.setProjectToUpdate
                   };
                   return (<Project {...projectProps} />)
                 })
@@ -80,32 +119,19 @@ class  App extends Component {
             </div>
             <div className="main">
               <h3>Add a project</h3>
-              <form>
-                <div className="form-group">
-                  <label htmlFor="name-input">Name</label>
-                  <input type="text" className="form-control" name="name-input" id="name-input" placeholder="Enter project name"/>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="name-input">Description</label>
-                  <input type="text" className="form-control" name="description-input" id="description-input" placeholder="Enter project description"/>
-                </div>
+              <AddProjectForm addProjects={this.addProjects} setActiveView={this.setActiveView}/>
+            </div>
 
-                <div className="form-group">
-                  <label htmlFor="name-input">Photo</label>
-                  <input type="text" className="form-control" name="photo-input" id="photo-input" value="project.jpg"/>
-                </div>
+          </View>
 
-                <div className="form-group">
-                  <label htmlFor="type-input">Type</label>
-                  <select className="form-control" name="type-input" id="type-input">
-                    <option value="1">Painting</option>
-                    <option value="2">Sculpture</option>
-                    <option value="3">Digital</option>
-                  </select>
-                </div>
+          <View viewName="edit-project" activeView={this.state.activeView} className="color3" >
 
-                <button type="submit" className="btn btn-primary">Add</button>
-              </form>
+            <div className="header">
+              <i onClick={() => this.setActiveView('projects')} className="fas fa-times"></i>
+            </div>
+            <div className="main">
+              <h3>Edit a project</h3>
+              <EditProjectForm {...this.state.projectToUpdate} updateProjects={this.updateProjects} setActiveView={this.setActiveView} />
             </div>
 
           </View>

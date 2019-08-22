@@ -28,6 +28,8 @@ class  App extends Component {
           description: 'Pretty project'
         }
       ],
+      types:[],
+      currentType:null,
       projectToUpdate:null
     };
 
@@ -41,14 +43,32 @@ class  App extends Component {
     var foundProject = this.state.projects.find((project) => {
       return project.id === id;
     })
-
     this.setState({projectToUpdate:foundProject})
   }
+
+  setCurrentType = (id) => {
+
+    var foundType = this.state.types.find((type) => {
+      return type.id == id;
+    })
+
+    foundType ? this.setState({currentType:foundType}) : this.setState({currentType:null})
+
+    
+  }
+
 
   getProjects = () => {
     axios.get(urlPrefix+'/projects')
     .then(res => {
       this.setState({projects:res.data});
+    })
+  }
+
+  getTypes = () => {
+    axios.get(urlPrefix+'/types')
+    .then(res => {
+      this.setState({types:res.data});
     })
   }
 
@@ -76,10 +96,27 @@ class  App extends Component {
 
   componentDidMount(){
     this.getProjects();
+    this.getTypes();
+  }
+
+  handleProjectTypeClick = (e) => {
+
+    var link = e.target;
+
+    this.setCurrentType(link.dataset.type);
+    this.setActiveView('projects');
   }
 
   render(){
+    var {currentType, projects} = this.state;
 
+    if(currentType){
+
+      projects = projects.filter(project => {
+        return project.type_id == currentType.id
+      })
+
+    }
     return (
         <div className="app">
       
@@ -90,10 +127,10 @@ class  App extends Component {
               <i onClick={() => this.setActiveView('nav')} className="fas fa-bars"></i>
             </div>
             <div className="main">
-              <h3>Projects</h3>
+              <h3>{ currentType ? currentType.name : 'All Projects'}</h3>
 
               {
-                this.state.projects.map((project) => {
+                projects.map((project) => {
 
                   var projectProps = {
                     ...project,
@@ -143,7 +180,18 @@ class  App extends Component {
             <div className="main">
 
               <ul className="menu">
-                <li><a onClick={() => this.setActiveView('projects')} className="color1" href="#">Projects</a></li>
+
+                <li><a data-type="null" onClick={this.handleProjectTypeClick} className="color1" href="#">All projects</a></li>
+                {
+                  this.state.types.map(type => {
+                    return (
+                      <li>
+                        <a data-type={type.id} onClick={this.handleProjectTypeClick} className="color1" href="#">{type.name}</a>
+                      </li>
+                      )
+                  })
+                }
+
                 <li><a onClick={() => this.setActiveView('add-project')} className="color2" href="#">Add a project</a></li>
          
               </ul>

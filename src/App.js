@@ -8,7 +8,7 @@ import EditProjectForm from './EditProjectForm';
 
 import './App.css';
 
-var urlPrefix = 'http://10.2.24.38:4000/api'
+var urlPrefix = 'http://10.2.24.43:4000/api'
 
 class  App extends Component {
 
@@ -94,6 +94,14 @@ class  App extends Component {
     })
   }
 
+  uploadFile = (formData) => {
+
+    // you get back a promis - show you later
+    var settings = { headers: {'Content-Type': 'multipart/form-data' }}
+    return axios.post(urlPrefix+'/upload',formData,settings)
+
+  }
+
   componentDidMount(){
     this.getProjects();
     this.getTypes();
@@ -156,7 +164,7 @@ class  App extends Component {
             </div>
             <div className="main">
               <h3>Add a project</h3>
-              <AddProjectForm addProjects={this.addProjects} setActiveView={this.setActiveView}/>
+              <AddProjectForm uploadFile={this.uploadFile} addProjects={this.addProjects} setActiveView={this.setActiveView}/>
             </div>
 
           </View>

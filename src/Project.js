@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 
+var serverUrl = 'http://10.2.24.43:4000/';
+
 class  Project extends Component {
 
 	handleTrashClick = () => {
@@ -17,11 +19,11 @@ class  Project extends Component {
 
   	render(){
 
-	  	var {name,description} = this.props
+	  	var {name,description,photo} = this.props
 
 	    return (
 	      <div className="card project">
-	        <img className="card-img-top" src="project.jpg" alt="Card image cap" />
+	        <img className="card-img-top" src={serverUrl+photo} alt="Card image cap" />
 	        <div className="card-body">
 	          <h5 className="card-title">{name}</h5>
 	          <p className="card-text">{description}</p>

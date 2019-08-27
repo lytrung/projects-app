@@ -5,10 +5,12 @@ import View from './View';
 import Project from './Project';
 import AddProjectForm from './AddProjectForm';
 import EditProjectForm from './EditProjectForm';
+import AddUserForm from './AddUserForm';
+import LoginForm from './LoginForm';
 
 import './App.css';
 
-var urlPrefix = 'http://10.2.24.43:4000/api'
+var urlPrefix = 'http://localhost:3001/api'
 
 class  App extends Component {
 
@@ -54,9 +56,7 @@ class  App extends Component {
 
     foundType ? this.setState({currentType:foundType}) : this.setState({currentType:null})
 
-    
   }
-
 
   getProjects = () => {
     axios.get(urlPrefix+'/projects')
@@ -94,9 +94,16 @@ class  App extends Component {
     })
   }
 
+  addUsers = (data) => {
+    axios.post(urlPrefix+'/users',data)
+    .then(res => {
+      console.log(res.data)
+    })
+
+  }
+
   uploadFile = (formData) => {
 
-    // you get back a promis - show you later
     var settings = { headers: {'Content-Type': 'multipart/form-data' }}
     return axios.post(urlPrefix+'/upload',formData,settings)
 
@@ -181,6 +188,30 @@ class  App extends Component {
 
           </View>
 
+          <View viewName="register" activeView={this.state.activeView} className="color2" >
+
+            <div className="header">
+              <i onClick={() => this.setActiveView('projects')} className="fas fa-times"></i>
+            </div>
+            <div className="main">
+              <h3>Register</h3>
+              <AddUserForm addUsers={this.addUsers} setActiveView={this.setActiveView}/>
+            </div>
+
+          </View>
+
+          <View viewName="login" activeView={this.state.activeView} className="color2" >
+
+            <div className="header">
+              <i onClick={() => this.setActiveView('projects')} className="fas fa-times"></i>
+            </div>
+            <div className="main">
+              <h3>Login</h3>
+              <LoginForm setActiveView={this.setActiveView}/>
+            </div>
+
+          </View>
+
         
           <View viewName="nav" activeView={this.state.activeView} className="color5" Name>
 
@@ -201,6 +232,8 @@ class  App extends Component {
                 }
 
                 <li><a onClick={() => this.setActiveView('add-project')} className="color2" href="#">Add a project</a></li>
+                <li><a onClick={() => this.setActiveView('register')} className="color2" href="#">Register</a></li>
+                <li><a onClick={() => this.setActiveView('login')} className="color2" href="#">Login</a></li>
          
               </ul>
 

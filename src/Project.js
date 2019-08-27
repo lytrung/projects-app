@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-var serverUrl = 'http://10.2.24.43:4000/';
+var serverUrl = 'http://localhost:3001/';
 
 class  Project extends Component {
 

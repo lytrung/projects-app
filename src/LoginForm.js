@@ -4,6 +4,9 @@ class  LoginForm extends Component {
 
 	constructor(props){
 		super(props);
+		this.state = {
+			message:''
+		}
 	}
 
 	handleFormSubmit = (e) => {
@@ -15,8 +18,15 @@ class  LoginForm extends Component {
 			password:formData.get('password-input'),
 		}
 
-
-
+		var {authenticate,setActiveView} = this.props;
+		authenticate(data).then(user => {
+			if(user){
+				setActiveView('projects')
+			}else{
+				this.setState({message:'Try again'})
+			}
+		})
+	
 	}
 
   	render(){
@@ -38,6 +48,7 @@ class  LoginForm extends Component {
 
 
 	        <button type="submit" className="btn btn-primary">Login</button>
+	        <p>{this.state.message}</p>
 	    </form>
 
     	);

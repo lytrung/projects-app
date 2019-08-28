@@ -10,7 +10,7 @@ import LoginForm from './LoginForm';
 
 import './App.css';
 
-var urlPrefix = 'http://localhost:3001/api'
+var urlPrefix = 'http://10.2.24.38:3001/api'
 
 class  App extends Component {
 
@@ -31,6 +31,7 @@ class  App extends Component {
         }
       ],
       types:[],
+      currentUser:null,
       currentType:null,
       projectToUpdate:null
     };
@@ -102,6 +103,13 @@ class  App extends Component {
 
   }
 
+  getSingleUser = (id) => {
+    axios.get(urlPrefix+'/users/'+id)
+    .then(res => {
+      this.setState({currentUser:res.data});
+    })
+  }
+
   uploadFile = (formData) => {
 
     var settings = { headers: {'Content-Type': 'multipart/form-data' }}
@@ -109,9 +117,27 @@ class  App extends Component {
 
   }
 
+  authenticate = (data) => {
+    return axios.post(urlPrefix+'/authenticate',data)
+                .then(res => {
+                    var user = res.data
+                    this.setState({currentUser:user})
+                    return user
+                })
+
+  }
+
   componentDidMount(){
     this.getProjects();
     this.getTypes();
+    console.log(localStorage);
+    var userId = localStorage.getItem('userId')
+
+    if(userId){
+      this.getSingleUser(userId)
+    }
+
+  
   }
 
   handleProjectTypeClick = (e) => {
@@ -120,6 +146,12 @@ class  App extends Component {
 
     this.setCurrentType(link.dataset.type);
     this.setActiveView('projects');
+  }
+
+  handleLogoutClick = () => {
+    localStorage.removeItem('userId')
+    this.setState({currentUser:null})
+    this.setActiveView('login')
   }
 
   render(){
@@ -138,7 +170,14 @@ class  App extends Component {
           <View viewName="projects" activeView={this.state.activeView} className="color1" >
 
             <div className="header">
-              <i onClick={() => this.setActiveView('add-project')} className="fas fa-plus"></i>
+
+              {this.state.currentUser ? (
+                <>
+                <span>Welcome {this.state.currentUser.name}</span>
+                <i onClick={() => this.setActiveView('add-project')} className="fas fa-plus"></i>
+                </>
+              ) : null}
+                         
               <i onClick={() => this.setActiveView('nav')} className="fas fa-bars"></i>
             </div>
             <div className="main">
@@ -152,7 +191,8 @@ class  App extends Component {
                     key: project.id,
                     deleteProjects: this.deleteProjects,
                     setActiveView: this.setActiveView,
-                    setProjectToUpdate: this.setProjectToUpdate
+                    setProjectToUpdate: this.setProjectToUpdate,
+                    user:this.state.currentUser
                   };
                   return (<Project {...projectProps} />)
                 })
@@ -171,7 +211,7 @@ class  App extends Component {
             </div>
             <div className="main">
               <h3>Add a project</h3>
-              <AddProjectForm uploadFile={this.uploadFile} addProjects={this.addProjects} setActiveView={this.setActiveView}/>
+              <AddProjectForm user={this.state.currentUser} uploadFile={this.uploadFile} addProjects={this.addProjects} setActiveView={this.setActiveView}/>
             </div>
 
           </View>
@@ -207,7 +247,7 @@ class  App extends Component {
             </div>
             <div className="main">
               <h3>Login</h3>
-              <LoginForm setActiveView={this.setActiveView}/>
+              <LoginForm authenticate={this.authenticate} setActiveView={this.setActiveView}/>
             </div>
 
           </View>
@@ -231,10 +271,22 @@ class  App extends Component {
                   })
                 }
 
-                <li><a onClick={() => this.setActiveView('add-project')} className="color2" href="#">Add a project</a></li>
-                <li><a onClick={() => this.setActiveView('register')} className="color2" href="#">Register</a></li>
-                <li><a onClick={() => this.setActiveView('login')} className="color2" href="#">Login</a></li>
-         
+                {this.state.currentUser ? (
+
+                  <>
+                  <li><a onClick={() => this.setActiveView('add-project')} className="color2" href="#">Add a project</a></li>
+                  <li><a onClick={this.handleLogoutClick} className="color2" href="#">Logout</a></li>
+                  </>
+
+                ) : (
+                  <>
+                  <li><a onClick={() => this.setActiveView('register')} className="color2" href="#">Register</a></li>
+                  <li><a onClick={() => this.setActiveView('login')} className="color2" href="#">Login</a></li>
+                  </>
+                )}
+
+
+  
               </ul>
 
             </div>

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-var serverUrl = 'http://localhost:3001/';
+var serverUrl = 'http://10.2.24.38:3001/';
 
 class  Project extends Component {
 
@@ -19,7 +19,7 @@ class  Project extends Component {
 
   	render(){
 
-	  	var {name,description,photo} = this.props
+	  	var {name,description,photo,user_id,user} = this.props
 
 	    return (
 	      <div className="card project">
@@ -29,8 +29,14 @@ class  Project extends Component {
 	          <p className="card-text">{description}</p>
 	          <p>
 	            <i className="fas fa-heart"></i>
-	            <i onClick={this.handleEditClick} className="fas fa-edit"></i>
-	            <i onClick={this.handleTrashClick} className="fas fa-trash"></i>
+				{(user && (user.id == user_id))? (
+					<>
+					<i onClick={this.handleEditClick} className="fas fa-edit"></i>
+	            	<i onClick={this.handleTrashClick} className="fas fa-trash"></i>
+	            	</>
+				) : null}
+	            
+
 	          </p>
 	        </div>
 	      </div>

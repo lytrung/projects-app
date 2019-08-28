@@ -13,7 +13,7 @@ class  AddProjectForm extends Component {
 	handleFormSubmit = (e) => {
 		e.preventDefault();
 
-		var {uploadFile,addProjects,setActiveView} = this.props;
+		var {uploadFile,addProjects,setActiveView, user} = this.props;
 
 		var formData = new FormData(this.form);
 
@@ -24,7 +24,8 @@ class  AddProjectForm extends Component {
 				name:formData.get('name-input'),
 				description:formData.get('description-input'),
 				photo: fileName,
-				type_id:formData.get('type-input')
+				type_id:formData.get('type-input'),
+				user_id:user.id
 			}
 			addProjects(data)
 			setActiveView('projects')
